@@ -1,29 +1,13 @@
-/**
- * @license
- * Copyright 2018 Google Inc. All Rights Reserved.
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * =============================================================================
- */
-import * as posenet from '@tensorflow-models/posenet';
-import dat from 'dat.gui';
+
+
 import Stats from 'stats.js';
 
 import { saveAs } from 'file-saver';
 
 import {drawBoundingBox, drawKeypoints, drawSkeleton, isMobile, toggleLoadingUI, tryResNetButtonName, tryResNetButtonText, updateTryResNetButtonDatGuiCss} from './demo_util';
-
-const videoWidth = 600;
-const videoHeight = 500;
+const request = require('request')
+const maxVideoSize = 513;
+const canvasSize = 400;
 const stats = new Stats();
 
 
@@ -31,7 +15,7 @@ const stats = new Stats();
 async function loadVideo() {
   setInterval(function() {
    var video = document.getElementById('video');
-   video.src = "http://127.0.0.1:8887/img?random="+new Date().getTime();
+   video.src = "http://172.100.199.23:8080/img?random="+new Date().getTime();
    console.log(video.src);
 
 
@@ -46,7 +30,7 @@ const defaultMobileNetInputResolution = 513;
 
 const defaultResNetMultiplier = 1.0;
 const defaultResNetStride = 32;
-const defaultResNetInputResolution = 257;
+const defaultResNetInputResolution = 801;
 
 const guiState = {
   algorithm: 'multi-pose',
@@ -62,15 +46,15 @@ const guiState = {
     minPartConfidence: 0.5,
   },
   multiPoseDetection: {
-    maxPoseDetections: 5,
+    maxPoseDetections: 20,
     minPoseConfidence: 0.15,
-    minPartConfidence: 0.1,
-    nmsRadius: 30.0,
+    minPartConfidence: 0.15,
+    nmsRadius: 20.0,
   },
   output: {
     showVideo: true,
-    showSkeleton: false,
-    showPoints: true,
+    showSkeleton: true,
+    showPoints: false,
     showBoundingBox: false,
   },
   net: null,
@@ -102,8 +86,8 @@ function detectPoseInRealTime(video, net) {
   // permutation on all the keypoints.
   const flipPoseHorizontal = true;
 
-  canvas.width = videoWidth;
-  canvas.height = videoHeight;
+  canvas.width = canvasSize;
+ canvas.height = canvasSize;
 
   async function poseDetectionFrame() {
     if (guiState.changeToArchitecture) {
@@ -186,8 +170,7 @@ function detectPoseInRealTime(video, net) {
 
     // Begin monitoring code for frames per second
     stats.begin();
-    var obj = {"nissan": "sentra", "color": "green"};
-    localStorage.setItem('myStorage', JSON.stringify(obj));
+
     let poses = [];
     let minPoseConfidence;
     let minPartConfidence;
@@ -216,7 +199,19 @@ function detectPoseInRealTime(video, net) {
         break;
     }
 
-    ctx.clearRect(0, 0, videoWidth, videoHeight);
+    ctx.clearRect(0, 0, canvasSize, canvasSize);
+
+
+
+    if (guiState.output.showVideo) {
+     ctx.save();
+     ctx.scale(-1, 1);
+     ctx.translate(-canvasSize, 0);
+     ctx.drawImage(video, 0, 0, canvasSize, canvasSize);
+     ctx.restore();
+   }
+
+    const scale = canvasSize / video.width;
 
 
 
@@ -241,9 +236,21 @@ function detectPoseInRealTime(video, net) {
 
     // End monitoring code for frames per second
     stats.end();
-    var datetime =  new Date().toLocaleString();
+    var timestamp =  new Date().toLocaleString();
     console.log(datetime+'\t'+count);
-
+    request.post('http://0.0.0.0:8080/add_counts', {
+ json: {
+   timestamp: timestamp,
+   count: count
+ }
+}, (error,res, body) => {
+ if(error) {
+   console.error(error+"DB")
+   return
+ }
+ console.log(`statusCode: ${res.statusCode}`)
+ console.log(body)
+})
     requestAnimationFrame(poseDetectionFrame);
   }
 
@@ -285,3 +292,4 @@ navigator.getUserMedia = navigator.getUserMedia ||
     navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
 // kick off the demo
 bindPage();
+
