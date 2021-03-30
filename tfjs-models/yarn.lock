@@ -2,6 +2,11 @@
 # yarn lockfile v1
 
 
+"@tensorflow-models/posenet@^1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@tensorflow-models/posenet/-/posenet-1.0.3.tgz#7f069eb895c06694840223cb8f4d3f94a46dc998"
+  integrity sha512-8VK8cNqX/qwsIGvG/opz0b5tbv27kqNI21JnL79EQ/oHRYHXz6JOqVFfCtNuLGwpvtypdGfcFDQwvJEZ7WniDw==
+
 "@types/events@*":
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/@types/events/-/events-1.2.0.tgz#81a6731ce4df43619e5c8c945383b3e62a89ea86"
@@ -924,9 +929,9 @@ wrappy@1:
   integrity sha1-tSQ9jz7BqjXxNkYFvA0QNuMKtp8=
 
 y18n@^3.2.1:
-  version "3.2.1"
-  resolved "https://registry.yarnpkg.com/y18n/-/y18n-3.2.1.tgz#6d15fba884c08679c0d77e88e7759e811e07fa41"
-  integrity sha1-bRX7qITAhnnA136I53WegR4H+kE=
+  version "3.2.2"
+  resolved "https://registry.yarnpkg.com/y18n/-/y18n-3.2.2.tgz#85c901bd6470ce71fc4bb723ad209b70f7f28696"
+  integrity sha512-uGZHXkHnhF0XeeAPgnKfPv1bgKAYyVvmNL1xlKsPYZPaIHxGti2hHqvOCQv71XMsLxu1QjergkqogUnms5D3YQ==
 
 yalc@~1.0.0-pre.21:
   version "1.0.0-pre.22"
